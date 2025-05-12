@@ -1,0 +1,30 @@
+digraph "Methodology Workflow" {
+	A [label="User Interaction" fillcolor=lightblue shape=parallelogram style=filled]
+	B [label="Facial Expression Recognition
+(CNN - VGGFace, OpenCV)" fillcolor=lightgray shape=box style=filled]
+	C [label="Voice Tone Analysis
+(MFCCs + LSTM)" fillcolor=lightgray shape=box style=filled]
+	D [label="Text Sentiment Analysis
+(BERT/GPT)" fillcolor=lightgray shape=box style=filled]
+	E [label="Context Awareness
+(Time, Weather, History)" fillcolor=lightgray shape=box style=filled]
+	F [label="Multi-Modal Emotion Fusion" fillcolor=lightgreen shape=ellipse style=filled]
+	G [label="Reinforcement Learning-based
+Music Recommendation" fillcolor=lightpink shape=box style=filled]
+	H [label="Hybrid AI-User Control" fillcolor=lightpink shape=box style=filled]
+	I [label="AI-Based Playlist Transition" fillcolor=lightpink shape=box style=filled]
+	J [label="Final Music Recommendation" fillcolor=lightblue shape=parallelogram style=filled]
+	A -> B
+	A -> C
+	A -> D
+	A -> E
+	B -> F
+	C -> F
+	D -> F
+	E -> F
+	F -> G
+	G -> H
+	G -> I
+	H -> J
+	I -> J
+}
