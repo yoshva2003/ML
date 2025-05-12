@@ -1,0 +1,363 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "ba3a462a-7ea1-4102-bded-c397875810c3",
+   "metadata": {},
+   "source": [
+    "# Travelling salesman Problem"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "8b18dc99-2e5a-4e21-bec8-18994447cff2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tsp=[[0,400,300,500],[400,0,300,500],[400,300,0,500],[500,300,400,0]]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ce9bb30f-d2db-46b1-b260-37979a5b63b4",
+   "metadata": {},
+   "source": [
+    "### find a random solution -random route"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "8eec8227-de1c-438f-b505-59f8c151622e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import random\n",
+    "def randomsolution(tsp):\n",
+    "    cities=list(range(len(tsp)))\n",
+    "    solution=[]\n",
+    "    for i in range (len(tsp)):\n",
+    "        randomcity=cities[random.randint(0,len(cities)-1)]\n",
+    "        solution.append(randomcity)\n",
+    "        cities.remove(randomcity)\n",
+    "    return solution"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "34a9af85-31fe-4f8d-810c-8a68f80e24cd",
+   "metadata": {},
+   "source": [
+    "### find the route length"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "4b4ca394-5fac-49f6-b55e-997a83e270d5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def routelength(tsp,solution):\n",
+    "    routelength=0\n",
+    "    for i in range (len(solution)):\n",
+    "        routelength+=tsp[solution[i-1]][solution[i]]\n",
+    "    return routelength"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "440782d9-5a01-4fa9-b077-b63ddfe6f600",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "random solution [1, 0, 3, 2]\n",
+      "route length 1600\n"
+     ]
+    }
+   ],
+   "source": [
+    "solution=randomsolution(tsp)\n",
+    "print(\"random solution\",solution)\n",
+    "print(\"route length\",routelength(tsp,solution))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2b3bd319-53fc-4287-85db-7f85c0738ddc",
+   "metadata": {},
+   "source": [
+    "### find the neighbour to our city "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "id": "439fe918-33f2-418a-b6de-67978884fe05",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def getneighbours(solution):\n",
+    "    neighbours=[]\n",
+    "    for i in range (len(solution)):\n",
+    "        for j in range (i+1,len(solution)):\n",
+    "            neighbour=solution.copy()\n",
+    "            neighbour[i]=solution[j]\n",
+    "            neighbour[j]=solution[i]\n",
+    "            neighbours.append(neighbour)\n",
+    "    return neighbours"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b882278e-27db-4241-ba70-a60d7b584d8e",
+   "metadata": {},
+   "source": [
+    "### Find the best neighbour from the set of all neighbours"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 59,
+   "id": "1a80f5c7-f9ce-48c7-8212-b5129f708abb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def getbestneighbour(tsp,neighbours):\n",
+    "    bestroutelength=routelength(tsp,neighbours[0])\n",
+    "    bestneighbour=neighbours[0]\n",
+    "    for neighbour in neighbours:\n",
+    "        currentroutelength=routelength(tsp,neighbour)\n",
+    "        if currentroutelength<bestroutelength:\n",
+    "            bestroutelength=currentroutelength\n",
+    "            bestneighbour=neighbour\n",
+    "    return bestneighbour,bestroutelength"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "id": "77944fb9-12b2-4685-a96e-6c48befd8450",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "generated neighbours: [[0, 1, 3, 2], [3, 0, 1, 2], [2, 0, 3, 1], [1, 3, 0, 2], [1, 2, 3, 0], [1, 0, 2, 3]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "neighbours=getneighbours(solution)\n",
+    "print(\"generated neighbours:\",neighbours)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1672e9b7-9f2d-4ff3-b890-422dba200b37",
+   "metadata": {},
+   "source": [
+    "### The best neighbour and its route length"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "id": "13ef23d5-ea83-40c5-bd29-2d7e46f91a69",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "best neighbour: [2, 0, 3, 1]\n",
+      "route length of best neighbour: 1500\n"
+     ]
+    }
+   ],
+   "source": [
+    "bestneighbour,bestroutelength=getbestneighbour(tsp,neighbours)\n",
+    "print(\"best neighbour:\",bestneighbour)\n",
+    "print(\"route length of best neighbour:\",bestroutelength)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "id": "b88baf9f-4cd4-46a0-83fd-2d6f0bc49478",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def hill_climbing(tsp,initial_solution,max_iteration=1000):\n",
+    "    current_solution=initial_solution\n",
+    "    current_length=routelength(tsp,current_solution)\n",
+    "    for _ in range(max_iteration):\n",
+    "       neighbours = getneighbours(current_solution)\n",
+    "       best_neighbour, best_length = getbestneighbour(tsp,neighbours)\n",
+    "\n",
+    "       if best_length < current_length:\n",
+    "            current_solution=best_neighbour\n",
+    "            current_length=best_length\n",
+    "       else:\n",
+    "            break\n",
+    "    return current_solution,current_length"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "id": "fc2d2c8c-d8a3-4619-984e-af7db3e8a75a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Final Solution After Hill Climbing: [2, 0, 3, 1]\n",
+      "Final Route Length: 1500\n"
+     ]
+    }
+   ],
+   "source": [
+    "final_solution, final_length = hill_climbing(tsp, solution)\n",
+    "print(\"Final Solution After Hill Climbing:\", final_solution)\n",
+    "print(\"Final Route Length:\", final_length)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "id": "2997d7bf-44ee-4008-a1e8-ff6b336dd881",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: streamlit in d:\\jupyter notebook\\lib\\site-packages (1.32.0)\n",
+      "Requirement already satisfied: altair<6,>=4.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (5.0.1)\n",
+      "Requirement already satisfied: blinker<2,>=1.0.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (1.6.2)\n",
+      "Requirement already satisfied: cachetools<6,>=4.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (5.3.3)\n",
+      "Requirement already satisfied: click<9,>=7.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (8.1.7)\n",
+      "Requirement already satisfied: numpy<2,>=1.19.3 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (1.26.4)\n",
+      "Requirement already satisfied: packaging<24,>=16.8 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (23.2)\n",
+      "Requirement already satisfied: pandas<3,>=1.3.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (2.2.2)\n",
+      "Requirement already satisfied: pillow<11,>=7.1.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (10.3.0)\n",
+      "Requirement already satisfied: protobuf<5,>=3.20 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (3.20.3)\n",
+      "Requirement already satisfied: pyarrow>=7.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (14.0.2)\n",
+      "Requirement already satisfied: requests<3,>=2.27 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (2.32.2)\n",
+      "Requirement already satisfied: rich<14,>=10.14.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (13.3.5)\n",
+      "Requirement already satisfied: tenacity<9,>=8.1.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (8.2.2)\n",
+      "Requirement already satisfied: toml<2,>=0.10.1 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (0.10.2)\n",
+      "Requirement already satisfied: typing-extensions<5,>=4.3.0 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (4.11.0)\n",
+      "Requirement already satisfied: gitpython!=3.1.19,<4,>=3.0.7 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (3.1.37)\n",
+      "Requirement already satisfied: pydeck<1,>=0.8.0b4 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (0.8.0)\n",
+      "Requirement already satisfied: tornado<7,>=6.0.3 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (6.4.1)\n",
+      "Requirement already satisfied: watchdog>=2.1.5 in d:\\jupyter notebook\\lib\\site-packages (from streamlit) (4.0.1)\n",
+      "Requirement already satisfied: jinja2 in d:\\jupyter notebook\\lib\\site-packages (from altair<6,>=4.0->streamlit) (3.1.4)\n",
+      "Requirement already satisfied: jsonschema>=3.0 in d:\\jupyter notebook\\lib\\site-packages (from altair<6,>=4.0->streamlit) (4.19.2)\n",
+      "Requirement already satisfied: toolz in d:\\jupyter notebook\\lib\\site-packages (from altair<6,>=4.0->streamlit) (0.12.0)\n",
+      "Requirement already satisfied: colorama in d:\\jupyter notebook\\lib\\site-packages (from click<9,>=7.0->streamlit) (0.4.6)\n",
+      "Requirement already satisfied: gitdb<5,>=4.0.1 in d:\\jupyter notebook\\lib\\site-packages (from gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.7)\n",
+      "Requirement already satisfied: python-dateutil>=2.8.2 in d:\\jupyter notebook\\lib\\site-packages (from pandas<3,>=1.3.0->streamlit) (2.9.0.post0)\n",
+      "Requirement already satisfied: pytz>=2020.1 in d:\\jupyter notebook\\lib\\site-packages (from pandas<3,>=1.3.0->streamlit) (2024.1)\n",
+      "Requirement already satisfied: tzdata>=2022.7 in d:\\jupyter notebook\\lib\\site-packages (from pandas<3,>=1.3.0->streamlit) (2023.3)\n",
+      "Requirement already satisfied: charset-normalizer<4,>=2 in d:\\jupyter notebook\\lib\\site-packages (from requests<3,>=2.27->streamlit) (2.0.4)\n",
+      "Requirement already satisfied: idna<4,>=2.5 in d:\\jupyter notebook\\lib\\site-packages (from requests<3,>=2.27->streamlit) (3.7)\n",
+      "Requirement already satisfied: urllib3<3,>=1.21.1 in d:\\jupyter notebook\\lib\\site-packages (from requests<3,>=2.27->streamlit) (2.2.2)\n",
+      "Requirement already satisfied: certifi>=2017.4.17 in d:\\jupyter notebook\\lib\\site-packages (from requests<3,>=2.27->streamlit) (2024.7.4)\n",
+      "Requirement already satisfied: markdown-it-py<3.0.0,>=2.2.0 in d:\\jupyter notebook\\lib\\site-packages (from rich<14,>=10.14.0->streamlit) (2.2.0)\n",
+      "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in d:\\jupyter notebook\\lib\\site-packages (from rich<14,>=10.14.0->streamlit) (2.15.1)\n",
+      "Requirement already satisfied: smmap<5,>=3.0.1 in d:\\jupyter notebook\\lib\\site-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.0)\n",
+      "Requirement already satisfied: MarkupSafe>=2.0 in d:\\jupyter notebook\\lib\\site-packages (from jinja2->altair<6,>=4.0->streamlit) (2.1.3)\n",
+      "Requirement already satisfied: attrs>=22.2.0 in d:\\jupyter notebook\\lib\\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (23.1.0)\n",
+      "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in d:\\jupyter notebook\\lib\\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (2023.7.1)\n",
+      "Requirement already satisfied: referencing>=0.28.4 in d:\\jupyter notebook\\lib\\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.30.2)\n",
+      "Requirement already satisfied: rpds-py>=0.7.1 in d:\\jupyter notebook\\lib\\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.10.6)\n",
+      "Requirement already satisfied: mdurl~=0.1 in d:\\jupyter notebook\\lib\\site-packages (from markdown-it-py<3.0.0,>=2.2.0->rich<14,>=10.14.0->streamlit) (0.1.0)\n",
+      "Requirement already satisfied: six>=1.5 in d:\\jupyter notebook\\lib\\site-packages (from python-dateutil>=2.8.2->pandas<3,>=1.3.0->streamlit) (1.16.0)\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install streamlit\n",
+    "import streamlit as st"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 81,
+   "id": "72d86031-f1f6-4b06-ba30-7fbddbdcf0c1",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "2024-12-26 12:10:03.383 \n",
+      "  \u001b[33m\u001b[1mWarning:\u001b[0m to view this Streamlit app on a browser, run it with the following\n",
+      "  command:\n",
+      "\n",
+      "    streamlit run D:\\jupyter notebook\\Lib\\site-packages\\ipykernel_launcher.py [ARGUMENTS]\n"
+     ]
+    }
+   ],
+   "source": [
+    "def main():\n",
+    "    st.title(\"Travelling Salesman problem(TSP) - Hill climbing\")\n",
+    "    tsp=st.text_input(\"Enter the distance Matrix\")\n",
+    "    if st.button(\"generate random solution\"):\n",
+    "     try:\n",
+    "        tsp=ast.literal_eval(tsp)\n",
+    "        initial_solution=randomsolution(tsp)\n",
+    "        st.write(f\"** initial random solution:**{initial_solution}\")\n",
+    "        st.write(f\"**Initial route length:** {routelength(tsp, initial_solution)}\")\n",
+    "        solution,length=hill_climbing(tsp,initial_solution)\n",
+    "        st.write(f\"**best solution after hill climbing:**{solution}\")\n",
+    "        st.write(f\"**best route length:**{length}\")\n",
+    "        if st.button(\"export to mysql database\"):\n",
+    "            save_to_mysql(solution,length)\n",
+    "            st.write(\"data successfully executed\")\n",
+    "     except Exception as e:\n",
+    "         st.write(\"invalid input.please enter valid input\")\n",
+    "if __name__==\"__main__\":\n",
+    " main()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "554a0e97-c53f-4e7e-a986-f51bbabd7d05",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
